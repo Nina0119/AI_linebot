@@ -6,7 +6,7 @@ import openai
 import pandas as pd 
 import datetime as dt
 import yfinance as yf
-from linebot.v3.webhooks.models import MessageEvent, TextMessageContent
+from linebot.v3.webhooks.models import MessageEvent, TextMessage
 
 def stock_price(stock_id="大盤", days=10):
     if stock_id == "大盤":
