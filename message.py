@@ -13,6 +13,7 @@ def Carousel_Template():
                     actions=[
                         MessageAction(label="歷史股價圖", text="股價圖"),
                         MessageAction(label="歷史股價資訊", text="股價資訊"),
+                        MessageAction(label="歷史股價資訊", text="股價資訊")
                     ]
                 ),
                 CarouselColumn(
