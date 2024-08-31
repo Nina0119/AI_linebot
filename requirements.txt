@@ -1,0 +1,11 @@
+line-bot-sdk
+flask
+gunicorn
+python-dotenv
+lxml
+requests
+pandas
+openai < 1.0.0
+yfinance
+matplotlib
+BeautifulSoup
