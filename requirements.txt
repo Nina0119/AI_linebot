@@ -5,7 +5,9 @@ python-dotenv
 lxml
 requests
 pandas
-openai < 1.0.0
+openai
 yfinance
 matplotlib
 BeautifulSoup
+numpy
+datetime
