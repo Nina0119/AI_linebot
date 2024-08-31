@@ -84,7 +84,8 @@ def format_stock_data(stock_data):
         f"{date}: 收盤價={close:.2f}, 每日報酬={pct_chg:.4f}, 漲跌價差={diff:.2f}"
         for date, close, pct_chg, diff in zip(stock_data['日期'], stock_data['收盤價'], stock_data['每日報酬'], stock_data['漲跌價差'])
     )
-    return formatted_data
+    message = TextMessage(text=formatted_data)
+    return message
 
 def stock_name():
     response = requests.get('https://isin.twse.com.tw/isin/C_public.jsp?strMode=2')
@@ -136,7 +137,9 @@ def format_news_data(news_data):
         f"{date}: {title}\n{content}"
         for _, date, title, content in news_data
     )
-    return formatted_data
+    message = TextMessage(text=formatted_data)
+    return message
+
 
 def generate_content_msg(stock_id, name_df):
     stock_name = get_stock_name(stock_id, name_df) if stock_id != "大盤" else stock_id
@@ -216,7 +219,7 @@ def handle_regular_message(messaging_api, event, msg, user_id):
         )
 
     elif '目錄' in msg:
-        message = buttons_message()
+        message = Carousel_Template()
         reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[message])
         messaging_api.reply_message(reply_message)
     if '股票分析' in msg:
@@ -227,7 +230,7 @@ def handle_regular_message(messaging_api, event, msg, user_id):
             TextMessage(text=reply_data)
         )
     elif '股價資訊' in msg:
-        stock_id = msg.replace("歷史股價資訊", "").strip()
+        stock_id = msg.replace("股價資訊", "").strip()
         stock_data = stock_price(stock_id)
         price_data = format_stock_data(stock_data)
         messaging_api.reply_message(
