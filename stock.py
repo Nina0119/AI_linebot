@@ -1,9 +1,8 @@
-
 from linebot.v3.messaging.models import ImageMessage, ButtonsTemplate, TemplateMessage, MessageAction
 import requests
 from bs4 import BeautifulSoup
 import openai
-import pandas as pd 
+import pandas as pd
 import datetime as dt
 import yfinance as yf
 from linebot.v3.webhooks.models import MessageEvent
@@ -28,7 +27,13 @@ def stock_price(stock_id="大盤", days=10):
         '漲跌價差': df['調整後收盤價'].diff().tolist()
     }
 
-    message = TextMessage(text=data)
+    # Convert data dictionary to string for TextMessage
+    data_str = "\n".join([
+        f"{date}: 收盤價={close:.2f}, 每日報酬={pct_chg:.4f}, 漲跌價差={diff:.2f}"
+        for date, close, pct_chg, diff in zip(data['日期'], data['收盤價'], data['每日報酬'], data['漲跌價差'])
+    ])
+
+    message = TextMessage(text=data_str)
     return message
 
 def format_stock_data(stock_data):
@@ -52,10 +57,10 @@ def stock_name():
     ]
 
     df = pd.DataFrame(data, columns=['股號', '股名', '產業別'])
-    message = TextMessage(text=df)
+    # Convert DataFrame to a string representation
+    df_str = df.to_string(index=False)
+    message = TextMessage(text=df_str)
     return message
-
-name_df = stock_name()
 
 def get_stock_name(stock_id, name_df):
     return name_df.set_index('股號').loc[stock_id, '股名']
@@ -92,7 +97,6 @@ def format_news_data(news_data):
     )
     message = TextMessage(text=formatted_data)
     return message
-
 
 def generate_content_msg(stock_id, name_df):
     stock_name = get_stock_name(stock_id, name_df) if stock_id != "大盤" else stock_id
@@ -145,7 +149,13 @@ def stock_fundamental(stock_id="大盤"):
         'EPS 季增率': quarterly_eps_growth.tolist()
     }
 
-    return data
+    # Convert fundamental data to a string representation
+    data_str = "\n".join(
+        f"{date}: 營收成長率={revenue_growth:.2f}, EPS={eps:.2f}, EPS 季增率={eps_growth:.2f}"
+        for date, revenue_growth, eps, eps_growth in zip(data['季日期'], data['營收成長率'], data['EPS'], data['EPS 季增率'])
+    )
+
+    return data_str
 
 def get_reply(messages):
     response = openai.ChatCompletion.create(
