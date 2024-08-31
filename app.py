@@ -311,7 +311,7 @@ def handle_regular_message(messaging_api, event, msg, user_id):
                 ReplyMessageRequest(
                     reply_token=event.reply_token,
                     messages=[TextMessage(text=f'Unable to retrieve stock data for {stock_code}. Please check the stock code.')]
-                )
+                ))
 
     else:   # New command to interact with GPT
         try:
