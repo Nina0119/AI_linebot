@@ -11,12 +11,12 @@ import os
 from dotenv import load_dotenv
 import logging
 import requests
-import openai  # Import OpenAI
 from message import *
 from stock import *
 import datetime as dt
 import numpy as np
 from bs4 import BeautifulSoup
+from openai import OpenAIError, RateLimitError, InvalidRequestError
 
 # Load environment variables
 load_dotenv()
@@ -58,6 +58,7 @@ def callback():
         abort(400)
 
     return 'OK'
+
 
 @handler.add(MessageEvent, message=TextMessageContent)
 
@@ -193,7 +194,7 @@ def handle_regular_message(messaging_api, event, msg, user_id):
             else:
                 raise Exception("Empty response from GPT")
 
-        except openai.error.OpenAIError as e:
+        except openai.OpenAIError as e:
             if "quota" in str(e):
                 error_message = "不好意思，ChatGPT額度用完了。請Key '目錄' 查看其他選項。"
             else:
