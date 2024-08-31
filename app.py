@@ -16,7 +16,7 @@ from stock import *
 import datetime as dt
 import numpy as np
 from bs4 import BeautifulSoup
-from openai import OpenAIError, RateLimitError, InvalidRequestError
+import openai 
 
 # Load environment variables
 load_dotenv()
