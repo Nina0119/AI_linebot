@@ -60,13 +60,16 @@ def callback():
     return 'OK'
 
 @handler.add(MessageEvent, message=TextMessageContent)
+
 def handle_message(event):
     user_id = event.source.user_id
     msg = event.message.text.strip()
     logging.info(f"Received message: {msg} from user: {user_id} with reply token: {event.reply_token}")
 
+    handle_regular_message(messaging_api, event, msg, user_id)
+
+
 def handle_regular_message(messaging_api, event, msg, user_id):
-    msg = msg.strip()
 
     if "股價圖" in msg:
         reply_text = "請輸入歷史股價XXX"
