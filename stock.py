@@ -7,6 +7,7 @@ import datetime as dt
 import yfinance as yf
 from linebot.v3.webhooks.models import MessageEvent
 from linebot.v3.messaging.models import TextMessage
+import numpy as np
 
 def stock_price(stock_id="大盤", days=10):
     if stock_id == "大盤":
@@ -115,7 +116,7 @@ def generate_content_msg(stock_id, name_df):
     message = TextMessage(text=content_msg)
     return message
 
-def stock_gpt(stock_id, name_df=name_df):
+def stock_gpt(stock_id, name_df):
     content_msg = generate_content_msg(stock_id, name_df)
 
     msg = [{
