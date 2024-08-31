@@ -62,12 +62,16 @@ def callback():
 
 @handler.add(MessageEvent, message=TextMessageContent)
 
+@handler.add(MessageEvent, message=TextMessageContent)
 def handle_message(event):
+    line_bot_api = MessagingApi(ApiClient(configuration))
     user_id = event.source.user_id
     msg = event.message.text.strip()
     logging.info(f"Received message: {msg} from user: {user_id} with reply token: {event.reply_token}")
 
-    handle_regular_message(messaging_api, event, msg, user_id)
+    # 默认回复消息
+    welcome_message = TextMessage(text='歡迎光臨！我是easy stock\n請輸入"目錄"查找功能')
+    line_bot_api.reply_message(ReplyMessageRequest(reply_token=event.reply_token, messages=[welcome_message]))
 
 
 def handle_regular_message(messaging_api, event, msg, user_id):
@@ -170,43 +174,7 @@ def handle_regular_message(messaging_api, event, msg, user_id):
             )
 
     else:
-        try:
-            prompt = f"User asked: {msg}\nYour response:"
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=[
-                    {"role": "system", "content": "You are a helpful assistant."},
-                    {"role": "user", "content": prompt},
-                ],
-                max_tokens=256,
-                temperature=0.5,
-            )
-
-            gpt_response = response["choices"][0]["message"]["content"].strip()
-
-            if gpt_response:
-                messaging_api.reply_message(
-                    ReplyMessageRequest(
-                        reply_token=event.reply_token,
-                        messages=[TextMessage(text=gpt_response)]
-                    )
-                )
-            else:
-                raise Exception("Empty response from GPT")
-
-        except openai.OpenAIError as e:
-            if "quota" in str(e):
-                error_message = "不好意思，ChatGPT額度用完了。請Key '目錄' 查看其他選項。"
-            else:
-                error_message = "Sorry, something went wrong with OpenAI API."
-
-            logging.error(f"Error with OpenAI API: {str(e)}")
-            messaging_api.reply_message(
-                ReplyMessageRequest(
-                    reply_token=event.reply_token,
-                    messages=[TextMessage(text=error_message)]
-                )
-            )
-
+        message = TextMessage(text='請輸入"目錄"查找功能')
+        
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
