@@ -116,6 +116,7 @@ def generate_content_msg(stock_id, name_df):
     message = TextMessage(text=content_msg)
     return message
 
+
 def stock_gpt(stock_id, name_df):
     content_msg = generate_content_msg(stock_id, name_df)
 
@@ -158,6 +159,9 @@ def stock_fundamental(stock_id="大盤"):
 
     return data_str
 
+name_df = stock_name()
+reply_data = stock_gpt(stock_id, name_df)
+
 def get_reply(messages):
     response = openai.ChatCompletion.create(
         model="gpt-3.5-turbo-1106",
@@ -165,3 +169,4 @@ def get_reply(messages):
     )
     reply = response.choices[0].message.content
     return reply
+

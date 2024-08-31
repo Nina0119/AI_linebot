@@ -59,7 +59,6 @@ def callback():
 
     return 'OK'
 
-
 @handler.add(MessageEvent, message=TextMessageContent)
 def handle_message(event):
     user_id = event.source.user_id
@@ -70,6 +69,8 @@ def handle_message(event):
     handle_regular_message(messaging_api, event, msg, user_id)
 
 def handle_regular_message(messaging_api, event, msg, user_id):
+    logging.info(f"Handling message: {msg}")
+
     if "股價圖" in msg:
         reply_text = "請輸入歷史股價XXX"
         logging.info(f"Replying with message: {reply_text}, type: {type(reply_text)}")
@@ -81,9 +82,11 @@ def handle_regular_message(messaging_api, event, msg, user_id):
         )
 
     elif '目錄' in msg:
+        logging.info("Detected '目錄' command")
         carousel = Carousel_Template()
         reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[carousel])
         messaging_api.reply_message(reply_message)
+        logging.info("Replied with carousel")
 
     elif '股票分析' in msg:
         stock_id = msg.replace("股票分析", "").strip()
@@ -178,6 +181,9 @@ def handle_regular_message(messaging_api, event, msg, user_id):
                 messages=[message]
             )
         )
+        logging.info("Replied with default message")
+
+
 
 
 if __name__ == "__main__":
