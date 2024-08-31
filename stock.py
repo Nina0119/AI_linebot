@@ -159,8 +159,6 @@ def stock_fundamental(stock_id="大盤"):
 
     return data_str
 
-name_df = stock_name()
-reply_data = stock_gpt(stock_id, name_df)
 
 def get_reply(messages):
     response = openai.ChatCompletion.create(
