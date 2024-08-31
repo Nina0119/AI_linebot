@@ -66,11 +66,15 @@ def handle_message(event):
     logging.info(f"Received message: {msg} from user: {user_id} with reply token: {event.reply_token}")
 
 def handle_regular_message(messaging_api, event, msg, user_id):
+    msg = msg.strip()
+
     if "股價圖" in msg:
+        reply_text = "請輸入歷史股價XXX"
+        logging.info(f"Replying with message: {reply_text}, type: {type(reply_text)}")
         messaging_api.reply_message(
             ReplyMessageRequest(
                 reply_token=event.reply_token,
-                messages=[TextMessage(text="請輸入歷史股價XXX")]  # Suggest the correct format for the stock price request
+                messages=[TextMessage(text=reply_text)]
             )
         )
 
@@ -78,35 +82,37 @@ def handle_regular_message(messaging_api, event, msg, user_id):
         message = Carousel_Template()
         reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[message])
         messaging_api.reply_message(reply_message)
-    if '股票分析' in msg:
+
+    elif '股票分析' in msg:
         stock_id = msg.replace("股票分析", "").strip()
         reply_data = stock_gpt(stock_id)
         messaging_api.reply_message(reply_data)
+
     elif '股價資訊' in msg:
         stock_id = msg.replace("股價資訊", "").strip()
         stock_data = stock_price(stock_id)
         price_data = format_stock_data(stock_data)
         messaging_api.reply_message(price_data)
+
     elif '股票新聞' in msg:
         stock_id = msg.replace("股票新聞", "").strip()
         news_data = stock_news(stock_id)
         formatted_news = format_news_data(news_data)
-        messaging_api.reply_message(formatted_news )
+        messaging_api.reply_message(formatted_news)
+
     elif '歷史股價' in msg:
         try:
-            stock_code = msg.replace("歷史股價", "").strip() + ".TW"  # Assume TSE stock code by adding .TW
+            stock_code = msg.replace("歷史股價", "").strip() + ".TW"
 
-            if not stock_code.replace(".TW", "").isdigit():  # Validate stock code format
+            if not stock_code.replace(".TW", "").isdigit():
                 raise ValueError("Invalid stock code format")
 
-            # Fetch stock data
             stock = yf.Ticker(stock_code)
-            hist = stock.history(period="1mo")  # Get stock data for the last month
+            hist = stock.history(period="1mo")
 
             if hist.empty:
                 raise ValueError("No stock data available")
 
-            # Plot stock prices
             dates = hist.index
             prices = hist['Close']
 
@@ -117,16 +123,14 @@ def handle_regular_message(messaging_api, event, msg, user_id):
             plt.ylabel('Close Price')
             plt.legend()
 
-            # Save plot to memory
             buf = io.BytesIO()
             plt.savefig(buf, format='png')
             buf.seek(0)
 
-            # Upload image to Imgur
             headers = {'Authorization': f'Client-ID {imgur_client_id}'}
             files = {'image': buf.getvalue()}
             response = requests.post('https://api.imgur.com/3/image', headers=headers, files=files)
-            
+
             if response.status_code == 200:
                 image_url = response.json()['data']['link']
             else:
@@ -137,7 +141,6 @@ def handle_regular_message(messaging_api, event, msg, user_id):
                 preview_image_url=image_url
             )
 
-            # Reply with the image
             messaging_api.reply_message(
                 ReplyMessageRequest(
                     reply_token=event.reply_token,
@@ -146,7 +149,6 @@ def handle_regular_message(messaging_api, event, msg, user_id):
             )
 
         except ValueError as ve:
-            # Handle known errors like invalid stock code
             logging.error(f"Value Error: {str(ve)}")
             messaging_api.reply_message(
                 ReplyMessageRequest(
@@ -155,36 +157,39 @@ def handle_regular_message(messaging_api, event, msg, user_id):
                 )
             )
         except Exception as e:
-            # Handle general errors
             logging.error(f"Error: {str(e)}")
             messaging_api.reply_message(
                 ReplyMessageRequest(
                     reply_token=event.reply_token,
                     messages=[TextMessage(text=f'Unable to retrieve stock data for {stock_code}. Please check the stock code.')]
-                ))
+                )
+            )
 
-    else:   # New command to interact with GPT
+    else:
         try:
             prompt = f"User asked: {msg}\nYour response:"
-            # Generate a response using OpenAI's API
             response = openai.ChatCompletion.create(
-            model="gpt-3.5-turbo",
-            messages=[
-                {"role": "system", "content": "You are a helpful assistant."},
-                {"role": "user", "content": prompt},
-            ],
-            max_tokens=256,
-            temperature=0.5,
-        )
+                model="gpt-3.5-turbo",
+                messages=[
+                    {"role": "system", "content": "You are a helpful assistant."},
+                    {"role": "user", "content": prompt},
+                ],
+                max_tokens=256,
+                temperature=0.5,
+            )
 
             gpt_response = response["choices"][0]["message"]["content"].strip()
 
-            messaging_api.reply_message(
-                ReplyMessageRequest(
-                    reply_token=event.reply_token,
-                    messages=[TextMessage(text=gpt_response)]
+            if gpt_response:
+                messaging_api.reply_message(
+                    ReplyMessageRequest(
+                        reply_token=event.reply_token,
+                        messages=[TextMessage(text=gpt_response)]
+                    )
                 )
-            )
+            else:
+                raise Exception("Empty response from GPT")
+
         except openai.error.OpenAIError as e:
             if "quota" in str(e):
                 error_message = "不好意思，ChatGPT額度用完了。請Key '目錄' 查看其他選項。"
@@ -198,7 +203,6 @@ def handle_regular_message(messaging_api, event, msg, user_id):
                     messages=[TextMessage(text=error_message)]
                 )
             )
-
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
