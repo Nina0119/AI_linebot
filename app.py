@@ -16,7 +16,7 @@ from message import *
 from stock import *
 import datetime as dt
 import numpy as np
-import BeautifulSoup
+from bs4 import BeautifulSoup
 
 # Load environment variables
 load_dotenv()

@@ -8,6 +8,6 @@ pandas
 openai
 yfinance
 matplotlib
-BeautifulSoup
+bs4
 numpy
 datetime
