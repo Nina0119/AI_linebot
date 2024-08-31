@@ -87,26 +87,29 @@ def handle_regular_message(messaging_api, event, msg, user_id):
         )
 
     elif '目錄' in msg:
-        message = Carousel_Template()
-        reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[message])
+        carousel = Carousel_Template()
+        reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[carousel])
         messaging_api.reply_message(reply_message)
 
     elif '股票分析' in msg:
         stock_id = msg.replace("股票分析", "").strip()
         reply_data = stock_gpt(stock_id)
-        messaging_api.reply_message(reply_data)
+        reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[reply_data])
+        messaging_api.reply_message(reply_message)
 
     elif '股價資訊' in msg:
         stock_id = msg.replace("股價資訊", "").strip()
         stock_data = stock_price(stock_id)
         price_data = format_stock_data(stock_data)
-        messaging_api.reply_message(price_data)
+        reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[price_data])
+        messaging_api.reply_message(reply_message)
 
     elif '股票新聞' in msg:
         stock_id = msg.replace("股票新聞", "").strip()
         news_data = stock_news(stock_id)
         formatted_news = format_news_data(news_data)
-        messaging_api.reply_message(formatted_news)
+        reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[formatted_news])
+        messaging_api.reply_message(reply_message)
 
     elif '歷史股價' in msg:
         try:
@@ -175,6 +178,6 @@ def handle_regular_message(messaging_api, event, msg, user_id):
 
     else:
         message = TextMessage(text='請輸入"目錄"查找功能')
-        
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
