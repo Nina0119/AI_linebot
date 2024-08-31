@@ -61,21 +61,15 @@ def callback():
 
 
 @handler.add(MessageEvent, message=TextMessageContent)
-
-@handler.add(MessageEvent, message=TextMessageContent)
 def handle_message(event):
-    line_bot_api = MessagingApi(ApiClient(configuration))
     user_id = event.source.user_id
     msg = event.message.text.strip()
     logging.info(f"Received message: {msg} from user: {user_id} with reply token: {event.reply_token}")
 
-    # 默认回复消息
-    welcome_message = TextMessage(text='歡迎光臨！我是easy stock\n請輸入"目錄"查找功能')
-    line_bot_api.reply_message(ReplyMessageRequest(reply_token=event.reply_token, messages=[welcome_message]))
-
+    # Route the message to the appropriate handler based on the content
+    handle_regular_message(messaging_api, event, msg, user_id)
 
 def handle_regular_message(messaging_api, event, msg, user_id):
-
     if "股價圖" in msg:
         reply_text = "請輸入歷史股價XXX"
         logging.info(f"Replying with message: {reply_text}, type: {type(reply_text)}")
@@ -178,6 +172,13 @@ def handle_regular_message(messaging_api, event, msg, user_id):
 
     else:
         message = TextMessage(text='請輸入"目錄"查找功能')
+        messaging_api.reply_message(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[message]
+            )
+        )
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
