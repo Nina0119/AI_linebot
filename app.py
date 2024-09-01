@@ -94,10 +94,15 @@ def handle_regular_message(messaging_api, event, msg, user_id):
 
     elif '股價資訊' in msg:
         stock_id = msg.replace("股價資訊", "").strip()
-        stock_data = stock_price(stock_id)
-        price_data = format_stock_data(stock_data)
-        reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[price_data])
-        messaging_api.reply_message(reply_message)
+        stock_data_message = stock_price(stock_id)
+        messaging_api.reply_message(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[stock_data_message]
+            )
+        )
+        logging.info("Replied with stock price information")
+
 
     elif '股票新聞' in msg:
         stock_id = msg.replace("股票新聞", "").strip()

@@ -8,6 +8,7 @@ import yfinance as yf
 from linebot.v3.webhooks.models import MessageEvent
 from linebot.v3.messaging.models import TextMessage
 import numpy as np
+import logging
 
 def stock_price(stock_id, days=10):
     if stock_id == "大盤":
@@ -19,23 +20,69 @@ def stock_price(stock_id, days=10):
     start = end - dt.timedelta(days=days)
     df = yf.download(stock_id, start=start)
 
+    if df.empty:
+        return TextMessage(text=f"無法取得 {stock_id} 的股價資訊。請確認股票代碼是否正確。")
+
     df.columns = ['開盤價', '最高價', '最低價', '收盤價', '調整後收盤價', '成交量']
 
-    data = {
-        '日期': df.index.strftime('%Y-%m-%d').tolist(),
-        '收盤價': df['收盤價'].tolist(),
-        '每日報酬': df['收盤價'].pct_change().tolist(),
-        '漲跌價差': df['調整後收盤價'].diff().tolist()
-    }
-
-    # Convert data dictionary to string for TextMessage
     data_str = "\n".join([
         f"{date}: 收盤價={close:.2f}, 每日報酬={pct_chg:.4f}, 漲跌價差={diff:.2f}"
-        for date, close, pct_chg, diff in zip(data['日期'], data['收盤價'], data['每日報酬'], data['漲跌價差'])
+        for date, close, pct_chg, diff in zip(
+            df.index.strftime('%Y-%m-%d').tolist(),
+            df['收盤價'].tolist(),
+            df['收盤價'].pct_change().tolist(),
+            df['調整後收盤價'].diff().tolist()
+        )
     ])
 
     message = TextMessage(text=data_str)
     return message
+
+
+
+def get_stock_name(stock_id, name_df):
+    return name_df.set_index('股號').loc[stock_id, '股名']
+
+def stock_news(stock_id):
+    if stock_id == "大盤":
+        stock_name = "台股"
+    else:
+        stock_name = stock_id  # Use the stock_id directly as the stock_name if it's not "大盤"
+    
+    stock_name = stock_name + " -盤中速報"  # Append the extra string to the stock name
+
+    try:
+        # Making the request to the news API
+        response = requests.get(f'https://ess.api.cnyes.com/ess/api/v1/news/keyword?q={stock_name}&limit=5&page=1')
+        response.raise_for_status()  # Ensure the request was successful
+        
+        # Parsing JSON data
+        json_data = response.json()
+        items = json_data['data']['items']
+        
+        if not items:
+            return TextMessage(text=f"沒有找到 {stock_name} 的相關新聞。")
+
+        news_list = []
+        for item in items:
+            title = item["title"]
+            publish_at = item["publishAt"]
+            formatted_date = dt.datetime.utcfromtimestamp(publish_at).strftime('%Y-%m-%d')
+            news_url = f'https://news.cnyes.com/news/id/{item["newsId"]}'
+            
+            news_list.append(f"{formatted_date}: {title}\n{news_url}\n")
+
+        # Join all the news items into one message
+        news_data_str = "\n".join(news_list)
+        return TextMessage(text=news_data_str)
+
+    except requests.exceptions.RequestException as e:
+        logging.error(f"Error fetching news: {str(e)}")
+        return TextMessage(text=f"無法獲取 {stock_name} 的新聞資訊，請稍後再試。")
+
+    except Exception as e:
+        logging.error(f"Unexpected error: {str(e)}")
+        return TextMessage(text="獲取新聞資訊時發生錯誤，請稍後再試。")
 
 def format_stock_data(stock_data):
     formatted_data = "\n".join(
@@ -45,59 +92,6 @@ def format_stock_data(stock_data):
     message = TextMessage(text=formatted_data)
     return message
 
-def stock_name():
-    response = requests.get('https://isin.twse.com.tw/isin/C_public.jsp?strMode=2')
-    url_data = BeautifulSoup(response.text, 'html.parser')
-    stock_company = url_data.find_all('tr')
-
-    data = [
-        (row.find_all('td')[0].text.split('\u3000')[0].strip(),
-         row.find_all('td')[0].text.split('\u3000')[1],
-         row.find_all('td')[4].text.strip())
-        for row in stock_company[2:] if len(row.find_all('td')[0].text.split('\u3000')[0].strip()) == 4
-    ]
-
-    df = pd.DataFrame(data, columns=['股號', '股名', '產業別'])
-    # Convert DataFrame to a string representation
-    df_str = df.to_string(index=False)
-    message = TextMessage(text=df_str)
-    return message
-
-def get_stock_name(stock_id, name_df):
-    return name_df.set_index('股號').loc[stock_id, '股名']
-
-def stock_news(stock_id):
-    if stock_id == "大盤":
-        stock_id = "台股"
-
-    stock_name = stock_name + " -盤中速報"
-
-    data = []
-    json_data = requests.get(f'https://ess.api.cnyes.com/ess/api/v1/news/keyword?q={stock_name}&limit=5&page=1').json()
-
-    items = json_data['data']['items']
-    for item in items:
-        news_id = item["newsId"]
-        title = item["title"]
-        publish_at = item["publishAt"]
-        utc_time = dt.datetime.utcfromtimestamp(publish_at)
-        formatted_date = utc_time.strftime('%Y-%m-%d')
-
-        url = requests.get(f'https://news.cnyes.com/news/id/{news_id}').content
-        soup = BeautifulSoup(url, 'html.parser')
-        p_elements = soup.find_all('p')
-        p = ''.join([paragraph.get_text() for paragraph in p_elements[4:]])
-
-        data.append([stock_name, formatted_date, title, p])
-    return data
-
-def format_news_data(news_data):
-    formatted_data = "\n".join(
-        f"{date}: {title}\n{content}"
-        for _, date, title, content in news_data
-    )
-    message = TextMessage(text=formatted_data)
-    return message
 
 def generate_content_msg(stock_id, name_df):
     stock_name = get_stock_name(stock_id, name_df) if stock_id != "大盤" else stock_id
