@@ -12,8 +12,8 @@ def Carousel_Template():
                     text='基本面相關功能',
                     actions=[
                         MessageAction(label="歷史股價圖", text="股價圖"),
-                        MessageAction(label="股票新聞", text="股票news"),
-                        MessageAction(label="歷史股價資訊", text="歷史股價")
+                        MessageAction(label="基本面資訊", text="每股盈餘 月營收 月營業額費用 稅後淨額"),
+                        MessageAction(label="歷史股價資訊", text="股價資訊")
                     ]
                 ),
                 CarouselColumn(
@@ -21,14 +21,15 @@ def Carousel_Template():
                     title='其他相關功能',
                     text='預測功能',
                     actions=[
-                        MessageAction(label="預測股價-台積電", text="台積電"),
-                        MessageAction(label="預測股價-鴻海", text="鴻海"),
+                        MessageAction(label="股票新聞", text="股票news"),
+                        MessageAction(label="預測股價", text="哪一隻"),
                         MessageAction(label="股價分析GPT", text="股價分析GPT")
                     ]
                 )
             ]
         )
     )
+
     return carousel_template_message
 
 
