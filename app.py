@@ -100,7 +100,7 @@ def handle_regular_message(messaging_api, event, msg, user_id):
                 messages=[TextMessage(text=reply_text)]
             )
         )
-    elif "歷史股價" in msg:
+    elif "歷史股價資訊" in msg:
         reply_text = "請輸入股價資訊XXX"
         messaging_api.reply_message(
             ReplyMessageRequest(
