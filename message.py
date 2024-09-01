@@ -1,5 +1,5 @@
 
-from linebot.v3.messaging.models import TemplateMessage, CarouselTemplate, CarouselColumn, MessageAction, ButtonsTemplate,TemplateSendMessage
+from linebot.v3.messaging.models import TemplateMessage, CarouselTemplate, CarouselColumn, MessageAction, ButtonsTemplate
 
 def Carousel_Template():
     carousel_template_message = TemplateMessage(
@@ -33,7 +33,7 @@ def Carousel_Template():
     return carousel_template_message
 
 def stock_buttons_template():
-    buttons_template = TemplateSendMessage(
+    buttons_template = TemplateMessage(
         alt_text='股票選單',
         template=ButtonsTemplate(
             title='股票選擇',
