@@ -43,13 +43,14 @@ def stock_price(stock_id, days=10):
 def get_stock_name(stock_id, name_df):
     return name_df.set_index('股號').loc[stock_id, '股名']
 
+
 def stock_news(stock_id):
     if stock_id == "大盤":
         stock_name = "台股"
     else:
         stock_name = stock_id  # Use the stock_id directly as the stock_name if it's not "大盤"
     
-    stock_name = stock_name + " -盤中速報"  # Append the extra string to the stock name
+    stock_name += " -盤中速報"  # Append the extra string to the stock name
 
     try:
         # Making the request to the news API
@@ -58,17 +59,17 @@ def stock_news(stock_id):
         
         # Parsing JSON data
         json_data = response.json()
-        items = json_data['data']['items']
+        items = json_data.get('data', {}).get('items', [])
         
         if not items:
             return TextMessage(text=f"沒有找到 {stock_name} 的相關新聞。")
 
         news_list = []
         for item in items:
-            title = item["title"]
-            publish_at = item["publishAt"]
-            formatted_date = dt.datetime.utcfromtimestamp(publish_at).strftime('%Y-%m-%d')
-            news_url = f'https://news.cnyes.com/news/id/{item["newsId"]}'
+            title = item.get("title", "無標題")
+            publish_at = item.get("publishAt", None)
+            formatted_date = dt.datetime.utcfromtimestamp(publish_at).strftime('%Y-%m-%d') if publish_at else "無日期"
+            news_url = f'https://news.cnyes.com/news/id/{item.get("newsId", "")}'
             
             news_list.append(f"{formatted_date}: {title}\n{news_url}\n")
 
@@ -83,6 +84,7 @@ def stock_news(stock_id):
     except Exception as e:
         logging.error(f"Unexpected error: {str(e)}")
         return TextMessage(text="獲取新聞資訊時發生錯誤，請稍後再試。")
+
 
 def format_stock_data(stock_data):
     formatted_data = "\n".join(
