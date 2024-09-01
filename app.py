@@ -85,6 +85,10 @@ def handle_regular_message(messaging_api, event, msg, user_id):
         reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[carousel])
         messaging_api.reply_message(reply_message)
 
+    elif '哪一隻' in msg:
+        carousel = stock_buttons_template()
+        reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[carousel])
+        messaging_api.reply_message(reply_message)
 
     elif '股票分析GPT' in msg:
         stock_id = msg.replace("股票分析GPT", "").strip()
