@@ -12,8 +12,8 @@ def Carousel_Template():
                     text='基本面相關功能',
                     actions=[
                         MessageAction(label="歷史股價圖", text="股價圖"),
-                        MessageAction(label="股價新聞", text="股價新聞"),
-                        MessageAction(label="歷史股價資訊", text="股價資訊")
+                        MessageAction(label="股票新聞", text="股票news"),
+                        MessageAction(label="歷史股價資訊", text="歷史股價")
                     ]
                 ),
                 CarouselColumn(

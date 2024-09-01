@@ -92,7 +92,7 @@ def handle_regular_message(messaging_api, event, msg, user_id):
         reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[reply_data])
         messaging_api.reply_message(reply_message)
 
-    elif "新聞" in msg:
+    elif "股票news" in msg:
         reply_text = "請輸入股票新聞XXX"
         messaging_api.reply_message(
             ReplyMessageRequest(
@@ -100,7 +100,7 @@ def handle_regular_message(messaging_api, event, msg, user_id):
                 messages=[TextMessage(text=reply_text)]
             )
         )
-    elif "資訊" in msg:
+    elif "歷史股價" in msg:
         reply_text = "請輸入股價資訊XXX"
         messaging_api.reply_message(
             ReplyMessageRequest(
