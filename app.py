@@ -84,10 +84,10 @@ def handle_regular_message(messaging_api, event, msg, user_id):
         carousel = Carousel_Template()
         reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[carousel])
         messaging_api.reply_message(reply_message)
-    
 
-    elif '股票分析' in msg:
-        stock_id = msg.replace("股票分析", "").strip()
+
+    elif '股票分析GPT' in msg:
+        stock_id = msg.replace("股票分析GPT", "").strip()
         reply_data = stock_gpt(stock_id)
         reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[reply_data])
         messaging_api.reply_message(reply_message)

@@ -9,7 +9,7 @@ from linebot.v3.webhooks.models import MessageEvent
 from linebot.v3.messaging.models import TextMessage
 import numpy as np
 
-def stock_price(stock_id="大盤", days=10):
+def stock_price(stock_id, days=10):
     if stock_id == "大盤":
         stock_id = "^TWII"
     else:
@@ -66,9 +66,9 @@ def stock_name():
 def get_stock_name(stock_id, name_df):
     return name_df.set_index('股號').loc[stock_id, '股名']
 
-def stock_news(stock_name="大盤"):
-    if stock_name == "大盤":
-        stock_name = "台股"
+def stock_news(stock_id):
+    if stock_id == "大盤":
+        stock_id = "台股"
 
     stock_name = stock_name + " -盤中速報"
 
