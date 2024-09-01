@@ -92,6 +92,22 @@ def handle_regular_message(messaging_api, event, msg, user_id):
         reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[reply_data])
         messaging_api.reply_message(reply_message)
 
+    elif "新聞" in msg:
+        reply_text = "請輸入股票新聞XXX"
+        messaging_api.reply_message(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[TextMessage(text=reply_text)]
+            )
+        )
+    elif "資訊" in msg:
+        reply_text = "請輸入股價資訊XXX"
+        messaging_api.reply_message(
+            ReplyMessageRequest(
+                reply_token=event.reply_token,
+                messages=[TextMessage(text=reply_text)]
+            )
+            )
     elif '股價資訊' in msg:
         stock_id = msg.replace("股價資訊", "").strip()
         stock_data_message = stock_price(stock_id)
@@ -107,8 +123,7 @@ def handle_regular_message(messaging_api, event, msg, user_id):
     elif '股票新聞' in msg:
         stock_id = msg.replace("股票新聞", "").strip()
         news_data = stock_news(stock_id)
-        formatted_news = format_news_data(news_data)
-        reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[formatted_news])
+        reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[news_data])
         messaging_api.reply_message(reply_message)
 
     elif '歷史股價' in msg:
