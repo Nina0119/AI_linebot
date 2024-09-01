@@ -13,7 +13,7 @@ def Carousel_Template():
                     actions=[
                         MessageAction(label="歷史股價圖", text="股價圖"),
                         MessageAction(label="基本面資訊", text="每股盈餘 月營收 月營業額費用 稅後淨額"),
-                        MessageAction(label="歷史股價資訊", text="股價資訊")
+                        MessageAction(label="歷史股價資訊", text="歷史股價資訊")
                     ]
                 ),
                 CarouselColumn(
