@@ -12,7 +12,7 @@ def Carousel_Template():
                     text='基本面相關功能',
                     actions=[
                         MessageAction(label="歷史股價圖", text="股價圖"),
-                        MessageAction(label="基本面資訊", text="每股盈餘 月營收 月營業額費用 稅後淨額"),
+                        MessageAction(label="基本面資訊", text="基本面"),
                         MessageAction(label="歷史股價資訊", text="歷史股價資訊")
                     ]
                 ),
@@ -41,11 +41,31 @@ def stock_buttons_template():
             actions=[
                 MessageAction(
                     label='台積電',
-                    text='台積電'
+                    text='2330'
                 ),
                 MessageAction(
                     label='鴻海',
-                    text='鴻海'
+                    text='2317'
+                )
+            ]
+        )
+    )
+    return buttons_template
+
+def stock_buttons_template2():
+    buttons_template = TemplateMessage(
+        alt_text='股票選單',
+        template=ButtonsTemplate(
+            title='股票選擇',
+            text='請選擇以下股票',
+            actions=[
+                MessageAction(
+                    label='台積電預測',
+                    text='台積電預測'
+                ),
+                MessageAction(
+                    label='鴻海',
+                    text='鴻海預測'
                 )
             ]
         )
