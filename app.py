@@ -86,6 +86,10 @@ def handle_regular_message(messaging_api, event, msg, user_id):
         messaging_api.reply_message(reply_message)
 
     elif '哪一隻' in msg:
+        carousel = stock_buttons_template2()
+        reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[carousel])
+        messaging_api.reply_message(reply_message)
+    elif '基本面' in msg:
         carousel = stock_buttons_template()
         reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[carousel])
         messaging_api.reply_message(reply_message)

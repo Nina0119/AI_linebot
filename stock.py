@@ -96,35 +96,45 @@ def format_stock_data(stock_data):
 
 
 def generate_content_msg(stock_id, name_df):
-    stock_name = get_stock_name(stock_id, name_df) if stock_id != "大盤" else stock_id
+
+    stock_name = get_stock_name(
+        stock_id, name_df) if stock_id != "大盤" else stock_id
+
+    # 獲取某支股票的價格資料
     price_data = stock_price(stock_id)
+    # 獲取某支股票的相關新聞
     news_data = stock_news(stock_name)
 
     content_msg = '請依據以下資料來進行分析並給出一份完整的分析報告:\n'
-    content_msg += f'近期價格資訊:\n {format_stock_data(price_data)}\n'
 
+    content_msg += f'近期價格資訊:\n {price_data}\n'
+
+    # 對個股進行分析
     if stock_id != "大盤":
         stock_value_data = stock_fundamental(stock_id)
         content_msg += f'每季營收資訊：\n {stock_value_data}\n'
-        content_msg += f'近期新聞資訊: \n {format_news_data(news_data)}\n'
-        content_msg += f'請給我{stock_name}近期的趨勢報告,請以詳細、嚴謹及專業的角度撰寫此報告,並提及重要的數字, reply in 繁體中文'
 
-    message = TextMessage(text=content_msg)
-    return message
+    content_msg += f'近期新聞資訊: \n {news_data}\n'
+    content_msg += f'請給我{stock_name}近期的趨勢報告,請以詳細、嚴謹及專業的角度撰寫此報告,並提及重要的數字, reply in 繁體中文'
 
+    return content_msg
 
+# 使用 GPT 模型來生成針對特定股票的專業趨勢分析報告
 def stock_gpt(stock_id, name_df):
     content_msg = generate_content_msg(stock_id, name_df)
 
     msg = [{
+        # 用"system"角色設定GPT扮演的角色是專業證券分析師，並且需要基於給定的數據進行分析。
         "role": "system",
         "content": "你現在是一位專業的證券分析師, 你會統整近期的股價、基本面、新聞資訊等方面並進行分析, 然後生成一份專業的趨勢分析報告"
     }, {
+        #包含了前面生成的 content_msg，即包含股票資料的訊息模板
         "role": "user",
         "content": content_msg
     }]
 
     reply_data = get_reply(msg)
+
     return reply_data
 
 def stock_fundamental(stock_id="大盤"):
