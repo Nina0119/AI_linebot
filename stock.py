@@ -164,16 +164,6 @@ def stock_fundamental(stock_id="大盤"):
     )
 
     return data_str
-
-
-def get_reply(messages):
-    response = openai.ChatCompletion.create(
-        model="gpt-3.5-turbo-1106",
-        messages=messages
-    )
-    reply = response.choices[0].message.content
-    return reply
-
 def stock_price2(stock_code):
     # 指定CSV檔案的路徑
     file_path = '2330.TW_summary.csv'
@@ -185,7 +175,7 @@ def stock_price2(stock_code):
     df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d')
     
     # 獲取當前日期
-    today_date = date.today()
+    today_date = df.today()
 
     # 找到今天的資料
     today_data = df[df['Date'] == today_date]
@@ -209,4 +199,12 @@ def stock_price2(stock_code):
 
     return message
 
+
+def get_reply(messages):
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo-1106",
+        messages=messages
+    )
+    reply = response.choices[0].message.content
+    return reply
 
