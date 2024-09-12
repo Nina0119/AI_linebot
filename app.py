@@ -13,6 +13,7 @@ import logging
 import requests
 from message import *
 from stock import *
+from csvstock import *
 import datetime as dt
 import numpy as np
 from bs4 import BeautifulSoup
@@ -97,6 +98,11 @@ def handle_regular_message(messaging_api, event, msg, user_id):
     elif '股票分析GPT' in msg:
         stock_id = msg.replace("股票分析GPT", "").strip()
         reply_data = stock_gpt(stock_id)
+        reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[reply_data])
+        messaging_api.reply_message(reply_message)
+    elif '2330' in msg:
+        stock_id =2330
+        reply_data = get_stock_price(stock_id)
         reply_message = ReplyMessageRequest(reply_token=event.reply_token, messages=[reply_data])
         messaging_api.reply_message(reply_message)
 

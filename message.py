@@ -64,7 +64,7 @@ def stock_buttons_template2():
                     text='台積電預測'
                 ),
                 MessageAction(
-                    label='鴻海',
+                    label='鴻海預測',
                     text='鴻海預測'
                 )
             ]
