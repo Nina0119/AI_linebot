@@ -3,13 +3,13 @@ import datetime as dt # 時間套件
 from datetime import datetime
 from linebot.v3.messaging import TextMessage
 
-# 指定CSV檔案的路徑
-file_path = '2330.TW_summary.csv'
-
-# 使用pandas讀取CSV檔案
-df = pd.read_csv(file_path)
 
 def get_stock_price(stock_code):
+  # 指定CSV檔案的路徑
+  file_path = '2330.TW_summary.csv'
+
+# 使用pandas讀取CSV檔案
+  df = pd.read_csv(file_path)
 
   df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d') # 假設日期格式是 YYYY-MM-DD
   today_date = date.today() # 獲取當前日期
