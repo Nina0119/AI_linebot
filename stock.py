@@ -175,7 +175,7 @@ def stock_price2(stock_code):
     df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d')
     
     # 獲取當前日期
-    today_date = df.today()
+    today_date = dt.today()
 
     # 找到今天的資料
     today_data = df[df['Date'] == today_date]
