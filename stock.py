@@ -91,7 +91,7 @@ def stock_price2(stock_code):
         return TextMessage(text="無效的日期格式，請使用 YYYY-MM-DD 格式。")
 
     # 找到歷史日期前一個月的日期
-    previous_month_date = history_date - pd.DateOffset(months=1)
+    previous_month_date = history_date - pd.DateOffset(months=3)
 
     # Print for debugging
     print("Previous month date:", previous_month_date)
@@ -116,7 +116,7 @@ def stock_price2(stock_code):
         send_text = f"月營收：{month_revenue}\n月營業額費用：{monthly_expense}\n每股盈餘：{eps}"
         message = TextMessage(text=send_text)
     else:
-        send_text = "未找到前一個月對應日期和股票代碼的資料。"
+        send_text = "未找到前三個月對應日期和股票代碼的資料。"
         message = TextMessage(text=send_text)
 
     return message
