@@ -75,7 +75,8 @@ def stock_price2(stock_code):
     # 使用pandas讀取CSV檔案
     df = pd.read_csv(file_path)
 
-    history_date=dt.datetime.today()
+    # 取得當前日期
+    history_date = dt.datetime.today()
 
     # 確保日期格式正確
     df['Date'] = pd.to_datetime(df['Date'], format='%Y-%m-%d')
@@ -90,13 +91,13 @@ def stock_price2(stock_code):
     except ValueError:
         return TextMessage(text="無效的日期格式，請使用 YYYY-MM-DD 格式。")
 
-    # 找到歷史日期前一個月的日期
+    # 找到歷史日期前三個月的日期
     previous_month_date = history_date - pd.DateOffset(months=3)
 
     # Print for debugging
     print("Previous month date:", previous_month_date)
 
-    # 找到前一個月的資料
+    # 找到前三個月的資料
     previous_month_data = df[df['Date'] == previous_month_date]
 
     # 根據股票代碼進行進一步篩選
